@@ -23,7 +23,7 @@ OBJS += lib.o serial.o
 
 TARGET = kzload
 
-CFLAGS = -Wall -mh -nostdinc -nostdlib -fno-buildin
+CFLAGS = -Wall -mh -nostdinc -nostdlib -fno-builtin
 CFLAGS += -I.
 CFLAGS += -Os
 CFLAGS += -DKZLOAD
@@ -36,24 +36,24 @@ LFLAGS = -static -T ld.scr -L.
 all: $(TARGET)
 
 $(TARGET) : $(OBJS)
-	          $(CC) $(OBJS) -o $(TARGET) $(CFLAGS) $(LFLAGS)
+						$(CC) $(OBJS) -o $(TARGET) $(CFLAGS) $(LFLAGS)
 						cp $(TARGET) $(TARGET).elf
 						$(STRIP) $(TARGET)
 
 .c.o : $<
-	     $(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 .s.o : $<
-	     $(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 
 $(TARGET).mot : $(TARGET)
-	              $(OBJCOPY) -O srec $(TARGET) $(TARGET).mot
+	$(OBJCOPY) -O srec $(TARGET) $(TARGET).mot
 
 image : $(TARGET).mot
 
 write : $(TARGET).mot
-	      $(H8WRITE) -3069 -f20 $(TARGET).mot $(H8WRITE_SETDEV)
+	$(H8WRITE) -3069 -f20 $(TARGET).mot $(H8WRITE_SETDEV)
 
-clean : 
-	       rm -f $(OBJS) $(TARGET) $(TARGET).elf $(TARGET).mot
+clean :
+	rm -f $(OBJS) $(TARGET) $(TARGET).elf $(TARGET).mot

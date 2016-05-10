@@ -3,7 +3,7 @@
 
 extern void start(void);
 
-boid (*vectors[])(void) = {
+void (*vectors[])(void) = {
   start, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
