@@ -1,1 +1,6 @@
 *.elf
+*.mot
+kzload
+kzload.*
+kozos.*
+kozos
