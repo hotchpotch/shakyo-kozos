@@ -17,6 +17,7 @@ void *memcpy(void *dst, const void *src, long len)
   const char *s = src;
   for (; len > 0; len--)
     *(d++) = *(s++);
+  return dst;
 }
 
 int memcmp(const void *b1, const void *b2, long len)
@@ -95,10 +96,10 @@ int putxval(unsigned long value, int column)
   p = buf + sizeof(buf) - 1;
   *(p--) = '\0';
 
-  if (!value || !column)
+  if (!value && !column)
     column++;
 
-  while (value && column) {
+  while (value || column) {
     *(p--) = "0123456789abcdef"[value & 0xF];
     value >>= 4;
     if (column) column--;
