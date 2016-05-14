@@ -66,7 +66,7 @@ long xmodem_recv(char *buf)
 
     c = serial_recv_byte(SERIAL_DEFAULT_DEVICE);
 
-    if (c == XMODEM_EOF) {
+    if (c == XMODEM_EOT) {
       serial_send_byte(SERIAL_DEFAULT_DEVICE, XMODEM_ACK);
       break;
     } else if (c == XMODEM_CAN) {
