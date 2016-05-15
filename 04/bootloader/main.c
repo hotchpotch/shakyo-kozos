@@ -47,7 +47,7 @@ int main(void)
 {
   static char buf[16];
   static long size  = -1;
-  static unsigned char loadbuf = NULL;
+  static unsigned char *loadbuf = NULL;
   extern int buffer_start;
 
   init();
