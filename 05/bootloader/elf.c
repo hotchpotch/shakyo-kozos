@@ -62,8 +62,9 @@ static int elf_load_program(struct elf_header *header)
   struct elf_program_header *phdr;
 
   for (i = 0; i < header->program_header_num; i++) {
-    ((char *)header + header->program_header_offset +
-     header->program_header_size * i);
+    phdr = (struct elf_program_header*)
+      ((char *)header + header->program_header_offset +
+       header->program_header_size * i);
 
     if (phdr->type != 1)
       continue;
