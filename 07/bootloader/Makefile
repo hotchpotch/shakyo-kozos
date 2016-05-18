@@ -32,6 +32,7 @@ LFLAGS = -static -T ld.scr -L.
 
 .SUFFIXES: .c .o
 .SUFFIXES: .s .o
+.SUFFIXES: .S .o
 
 all: $(TARGET)
 
@@ -46,6 +47,8 @@ $(TARGET) : $(OBJS)
 .s.o : $<
 	$(CC) -c $(CFLAGS) $<
 
+.S.o : $<
+	$(CC) -c $(CFLAGS) $<
 
 $(TARGET).mot : $(TARGET)
 	$(OBJCOPY) -O srec $(TARGET) $(TARGET).mot
