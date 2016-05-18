@@ -105,6 +105,41 @@ unsigned char serial_recv_byte(int index)
   return c;
 }
 
+int serial_intr_is_send_enable(int index)
+{
+  volatile struct h8_3069f_sci *sci = regs[index].sci;
+  return (sci->scr & H8_3069F_SCI_SCR_TIE) ? 1 : 0;
+}
+
+void serial_intr_send_enable(int index)
+{
+  volatile struct h8_3069f_sci *sci = regs[index].sci;
+  sci->scr |= H8_3069F_SCI_SCR_TIE;
+}
+
+void serial_intr_send_disable(int index)
+{
+  volatile struct h8_3069f_sci *sci = regs[index].sci;
+  sci->scr &= ~H8_3069F_SCI_SCR_TIE;
+}
+
+int serial_intr_is_recv_enable(int index)
+{
+  volatile struct h8_3069f_sci *sci = regs[index].sci;
+  return (sci->scr & H8_3069F_SCI_SCR_RIE) ? 1 : 0;
+}
+
+void serial_intr_recv_enable(int index)
+{
+  volatile struct h8_3069f_sci *sci = regs[index].sci;
+  sci->scr |= H8_3069F_SCI_SCR_RIE;
+}
+
+void serial_intr_recv_disable(int index)
+{
+  volatile struct h8_3069f_sci *sci = regs[index].sci;
+  sci->scr &= ~H8_3069F_SCI_SCR_RIE;
+}
 
 
 
