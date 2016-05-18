@@ -37,7 +37,7 @@ SECTIONS
   } > rom
 
   .softvec : {
-    _softvec_start = . ;
+    _softvec = . ;
   } > softvec
 
   .buffer : {

@@ -7,7 +7,7 @@ extern char softvec;
 
 typedef short softvec_type_t;
 
-typedef void (*sortvec_handler_t)(softvec_type_t type, unsigned long sp);
+typedef void (*softvec_handler_t)(softvec_type_t type, unsigned long sp);
 
 #define SOFTVECS ((softvec_handler_t *)(SOFTVEC_ADDR))
 

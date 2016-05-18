@@ -1,11 +1,11 @@
 #include "defines.h"
 #include "intr.h"
-#include "interrput.h"
+#include "interrupt.h"
 
 int softvec_init(void)
 {
   int type;
-  for (type = 0, type < SOFTVEC_TYPE_NUM; type++)
+  for (type = 0; type < SOFTVEC_TYPE_NUM; type++)
     softvec_setintr(type, NULL);
   return 0;
 }
