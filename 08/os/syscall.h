@@ -3,7 +3,7 @@
 #include "defines.h"
 
 typedef enum {
-  KZ_SYSCALL_TYPE_RUN = 0;
+  KZ_SYSCALL_TYPE_RUN = 0,
   KZ_SYSCALL_TYPE_EXIT,
 } kz_syscall_type_t;
 
