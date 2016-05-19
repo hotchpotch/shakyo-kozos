@@ -1,6 +1,8 @@
 #ifndef _DEFINES_H_INCLUDED_
 #define _DEFINES_H_INCLUDED_
 
+#define DEBUG 1
+
 #define NULL ((void *)0)
 #define SERIAL_DEFAULT_DEVICE 1
 

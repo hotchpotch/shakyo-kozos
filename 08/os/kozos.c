@@ -88,6 +88,12 @@ static void thread_init(kz_thread *thp)
 static kz_thread_id_t thread_run(kz_func_t func, char *name,
     int stacksize, int argc, char *argv[])
 {
+  if (DEBUG) {
+    puts("thread run-> ");
+    puts(name);
+    puts("\n");
+  }
+
   int i;
   kz_thread *thp;
   uint32 *sp;
