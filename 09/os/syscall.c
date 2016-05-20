@@ -36,7 +36,7 @@ int kz_sleep(void)
   return param.un.sleep.ret;
 }
 
-int kz_wakeup(kz_tread_id_t id)
+int kz_wakeup(kz_thread_id_t id)
 {
   kz_syscall_param_t param;
   param.un.wakeup.id = id;

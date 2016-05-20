@@ -62,9 +62,9 @@ static int getcurrent(void)
   }
   current->flags &= ~KZ_THREAD_FLAG_READY;
 
-  readyque.head = current->next;
-  if (readyque.head == NULL) {
-    readyque.tail = NULL;
+  readyque[current->priority].head = current->next;
+  if (readyque[current->priority].head == NULL) {
+    readyque[current->priority].tail = NULL;
   }
   current->next = NULL;
 
@@ -109,7 +109,7 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name, int priority,
     puts("thread run-> name: ");
     puts(name);
     puts(" priority: ");
-    puts(priority);
+    putxval(priority, 2);
     puts("\n");
   }
 
@@ -203,12 +203,12 @@ static kz_thread_id_t thread_getid(void)
   return (kz_thread_id_t)current;
 }
 
-static int kz_thread_chpri(int priority)
+static int thread_chpri(int priority)
 {
   int old = current->priority;
   if (priority > 0)
     current->priority = priority;
-  putcurrent;
+  putcurrent();
   return old;
 }
 

@@ -13,7 +13,7 @@ int kz_wakeup(kz_thread_id_t id);
 kz_thread_id_t kz_getid(void);
 int kz_chpri(int priority);
 
-void kz_start(kz_func_t func, char *name, int stacksize,
+void kz_start(kz_func_t func, char *name, int priority, int stacksize,
     int argc, char *argv[]);
 void kz_sysdown(void);
 void kz_syscall(kz_syscall_type_t type, kz_syscall_param_t *param);
