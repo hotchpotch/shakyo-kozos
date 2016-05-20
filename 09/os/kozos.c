@@ -236,19 +236,19 @@ static void call_functions(kz_syscall_type_t type, kz_syscall_param_t *p)
     case KZ_SYSCALL_TYPE_EXIT:
       thread_exit();
       break;
-    case  KZ_SYCALL_TYPE_WAIT:
+    case  KZ_SYSCALL_TYPE_WAIT:
       p->un.wait.ret = thread_wait();
       break;
-    case  KZ_SYCALL_TYPE_SLEEP:
+    case  KZ_SYSCALL_TYPE_SLEEP:
       p->un.sleep.ret = thread_sleep();
       break;
-    case  KZ_SYCALL_TYPE_WAKEUP:
+    case  KZ_SYSCALL_TYPE_WAKEUP:
       p->un.wakeup.ret = thread_wakeup(p->un.wakeup.id);
       break;
-    case  KZ_SYCALL_TYPE_GETID:
+    case  KZ_SYSCALL_TYPE_GETID:
       p->un.getid.ret = thread_getid();
       break;
-    case  KZ_SYCALL_TYPE_CHPRI:
+    case  KZ_SYSCALL_TYPE_CHPRI:
       p->un.chpri.ret = thread_chpri(p->un.chpri.priority);
       break;
     default:
