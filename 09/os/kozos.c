@@ -7,6 +7,7 @@
 #include "lib.h"
 
 #define THREAD_NUM 6
+#define PRIORITY_NUM 16
 #define THREAD_NAME_SIZE 15
 
 typedef struct _kz_context {
@@ -16,7 +17,10 @@ typedef struct _kz_context {
 typedef struct _kz_thread {
   struct _kz_thread *next;
   char name[THREAD_NAME_SIZE + 1];
+  int priority;
   char *stack;
+  uint32 flags;
+#define KZ_THREAD_FLAG_READY ( 1 << 0 )
 
   struct {
     kz_func_t func;
@@ -35,7 +39,7 @@ typedef struct _kz_thread {
 static struct {
   kz_thread *head;
   kz_thread *tail;
-} readyque;
+} readyque[PRIORITY_NUM];
 
 static kz_thread *current;
 static kz_thread threads[THREAD_NUM];
@@ -48,6 +52,15 @@ static int getcurrent(void)
   if (current == NULL) {
     return -1;
   }
+  if (!(current->flags & KZ_THREAD_FLAG_READY)) {
+    return 1;
+  }
+
+  readyque[current->priority].head = current->next;
+  if (readyque[current->priority].head == NULL) {
+    readyque[current->priority].tail = NULL;
+  }
+  current->flags &= ~KZ_THREAD_FLAG_READY;
 
   readyque.head = current->next;
   if (readyque.head == NULL) {
@@ -63,13 +76,17 @@ static int putcurrent(void)
   if (current == NULL) {
     return -1;
   }
-
-  if (readyque.tail) {
-    readyque.tail->next = current;
-  } else {
-    readyque.head = current;
+  if (current->flags & KZ_THREAD_FLAG_READY) {
+    return 1;
   }
-  readyque.tail = current;
+
+  if (readyque[current->priority].tail) {
+    readyque[current->priority].tail->next = current;
+  } else {
+    readyque[current->priority].head = current;
+  }
+  readyque[current->priority].tail = current;
+  current->flags |= KZ_THREAD_FLAG_READY;
 
   return 0;
 }
@@ -85,12 +102,14 @@ static void thread_init(kz_thread *thp)
   thread_end();
 }
 
-static kz_thread_id_t thread_run(kz_func_t func, char *name,
+static kz_thread_id_t thread_run(kz_func_t func, char *name, int priority,
     int stacksize, int argc, char *argv[])
 {
   if (DEBUG) {
-    puts("thread run-> ");
+    puts("thread run-> name: ");
     puts(name);
+    puts(" priority: ");
+    puts(priority);
     puts("\n");
   }
 
@@ -113,6 +132,8 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
 
   strcpy(thp->name, name);
   thp->next = NULL;
+  thp->priority = priority;
+  thp->flags = 0;
   thp->init.func = func;
   thp->init.argc = argc;
   thp->init.argv = argv;
@@ -127,7 +148,7 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
   *(--sp) = (uint32)thread_end;
 
   // set program counter
-  *(--sp) = (uint32)thread_init;
+  *(--sp) = (uint32)thread_init | ((uint32)(priority ? 0 : 0xc0) << 24);
 
   *(--sp) = 0; /* ER6 */
   *(--sp) = 0; /* ER5 */
@@ -155,6 +176,45 @@ static int thread_exit(void)
   return 0;
 }
 
+static int thread_wait(void)
+{
+  putcurrent();
+  return 0;
+}
+
+static int thread_sleep(void)
+{
+  return 0;
+}
+
+static int thread_wakeup(kz_thread_id_t id)
+{
+  putcurrent();
+
+  current = (kz_thread *)id;
+  putcurrent();
+
+  return 0;
+}
+
+static kz_thread_id_t thread_getid(void)
+{
+  putcurrent();
+  return (kz_thread_id_t)current;
+}
+
+static int kz_thread_chpri(int priority)
+{
+  int old = current->priority;
+  if (priority > 0)
+    current->priority = priority;
+  putcurrent;
+  return old;
+}
+
+
+
+
 static int setintr(softvec_type_t type, kz_handler_t handler)
 {
   static void thread_intr(softvec_type_t type, unsigned long sp);
@@ -170,14 +230,29 @@ static void call_functions(kz_syscall_type_t type, kz_syscall_param_t *p)
   switch(type) {
     case KZ_SYSCALL_TYPE_RUN:
       p->un.run.ret = thread_run(p->un.run.func, p->un.run.name,
-          p->un.run.stacksize,
+          p->un.run.priority, p->un.run.stacksize,
           p->un.run.argc, p->un.run.argv);
       break;
     case KZ_SYSCALL_TYPE_EXIT:
-     thread_exit();
-    break;
-  default:
-    break; 
+      thread_exit();
+      break;
+    case  KZ_SYCALL_TYPE_WAIT:
+      p->un.wait.ret = thread_wait();
+      break;
+    case  KZ_SYCALL_TYPE_SLEEP:
+      p->un.sleep.ret = thread_sleep();
+      break;
+    case  KZ_SYCALL_TYPE_WAKEUP:
+      p->un.wakeup.ret = thread_wakeup(p->un.wakeup.id);
+      break;
+    case  KZ_SYCALL_TYPE_GETID:
+      p->un.getid.ret = thread_getid();
+      break;
+    case  KZ_SYCALL_TYPE_CHPRI:
+      p->un.chpri.ret = thread_chpri(p->un.chpri.priority);
+      break;
+    default:
+      break; 
   }
 }
 
@@ -189,10 +264,17 @@ static void kz_syscall_proc(kz_syscall_type_t type, kz_syscall_param_t *p)
 
 static void schedule(void)
 {
-  if (!readyque.head)
+  int i;
+
+  for (i = 0; i < PRIORITY_NUM; i++) {
+    if (readyque[i].head)
+      break;
+  }
+
+  if (i == PRIORITY_NUM)
     kz_sysdown();
 
-  current = readyque.head;
+  current = readyque[i].head;
 }
 
 static void syscall_intr(void)
@@ -219,19 +301,19 @@ static void thread_intr(softvec_type_t type, unsigned long sp)
   dispatch(&current->context);
 }
 
-void kz_start(kz_func_t func, char *name, int stacksize,
+void kz_start(kz_func_t func, char *name, int priority, int stacksize,
     int argc, char *argv[])
 {
   current = NULL;
 
-  readyque.head = readyque.tail = NULL;
+  memset(readyque, 0, sizeof(readyque));
   memset(threads, 0, sizeof(threads));
   memset(handlers, 0, sizeof(handlers));
 
   setintr(SOFTVEC_TYPE_SYSCALL, syscall_intr);
   setintr(SOFTVEC_TYPE_SOFTERR, softerr_intr);
 
-  current = (kz_thread *)thread_run(func, name, stacksize, argc, argv);
+  current = (kz_thread *)thread_run(func, name, priority, stacksize, argc, argv);
 
   dispatch(&current->context);
 }
