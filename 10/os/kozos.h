@@ -22,4 +22,13 @@ void kz_syscall(kz_syscall_type_t type, kz_syscall_param_t *param);
 
 int test10_1_main(int argc, char *argv[]);
 
+/*
+int test09_1_main(int argc, char *argv[]);
+int test09_2_main(int argc, char *argv[]);
+int test09_3_main(int argc, char *argv[]);
+extern kz_thread_id_t test09_1_id;
+extern kz_thread_id_t test09_2_id;
+extern kz_thread_id_t test09_3_id;
+*/
+
 #endif

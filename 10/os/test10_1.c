@@ -5,6 +5,7 @@
 
 int test10_1_main(int argc, char *argv[])
 {
+  puts("hello\n");
   char *p1, *p2;
   int i, j;
 

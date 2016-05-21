@@ -43,7 +43,7 @@ static void wait()
 {
   volatile long i;
   //for (i = 0; i < 300000; i++)
-  for (i = 0; i < 50000; i++)
+  for (i = 0; i < 10000; i++)
     ;
 }
 
