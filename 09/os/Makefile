@@ -20,9 +20,10 @@ OBJS += kozos.o syscall.o test09_1.o test09_2.o test09_3.o
 
 TARGET = kozos
 
-CFLAGS = -Wall -mh -nostdinc -nostdlib -fno-builtin
+CFLAGS = -Wall -mh  -nostdinc -nostdlib -fno-builtin
 CFLAGS += -I.
 CFLAGS += -Os
+#CFLAGS += -g
 CFLAGS += -DKOZOS
 
 LFLAGS = -static -T ld.scr -L.
