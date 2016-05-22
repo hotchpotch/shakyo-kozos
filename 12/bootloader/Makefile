@@ -14,20 +14,19 @@ OBJDUMP = $(BINDIR)/$(ADDNAME)objdump
 RANLIB = $(BINDIR)/$(ADDNAME)ranlib
 STRIP = $(BINDIR)/$(ADDNAME)strip
 
-OBJS = startup.o main.o interrupt.o
-OBJS += lib.o serial.o
-OBJS += kozos.o syscall.o memory.o
-#OBJS += test09_1.o test09_2.o test09_3.o
-#OBJS += test10_1.o
-OBJS += test11_1.o test11_2.o
+H8WRITE = $(BINDIR)/h8write
 
-TARGET = kozos
+H8WRITE_SETDEV = /dev/ttyUSB0
 
-CFLAGS = -Wall -mh  -nostdinc -nostdlib -fno-builtin
+OBJS = vector.o startup.o intr.o main.o interrupt.o
+OBJS += lib.o serial.o xmodem.o elf.o
+
+TARGET = kzload
+
+CFLAGS = -Wall -mh -nostdinc -nostdlib -fno-builtin
 CFLAGS += -I.
 CFLAGS += -Os
-#CFLAGS += -g
-CFLAGS += -DKOZOS
+CFLAGS += -DKZLOAD
 
 LFLAGS = -static -T ld.scr -L.
 
@@ -48,5 +47,16 @@ $(TARGET) : $(OBJS)
 .s.o : $<
 	$(CC) -c $(CFLAGS) $<
 
+.S.o : $<
+	$(CC) -c $(CFLAGS) $<
+
+$(TARGET).mot : $(TARGET)
+	$(OBJCOPY) -O srec $(TARGET) $(TARGET).mot
+
+image : $(TARGET).mot
+
+write : $(TARGET).mot
+	$(H8WRITE) -3069 -f20 $(TARGET).mot $(H8WRITE_SETDEV)
+
 clean :
-	rm -f $(OBJS) $(TARGET) $(TARGET).elf
+	rm -f $(OBJS) $(TARGET) $(TARGET).elf $(TARGET).mot
