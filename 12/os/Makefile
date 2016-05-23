@@ -16,10 +16,10 @@ STRIP = $(BINDIR)/$(ADDNAME)strip
 
 OBJS = startup.o main.o interrupt.o
 OBJS += lib.o serial.o
-OBJS += kozos.o syscall.o memory.o
+OBJS += kozos.o syscall.o memory.o consdrv.o command.o
 #OBJS += test09_1.o test09_2.o test09_3.o
 #OBJS += test10_1.o
-OBJS += test11_1.o test11_2.o
+#OBJS += test11_1.o test11_2.o
 
 TARGET = kozos
 

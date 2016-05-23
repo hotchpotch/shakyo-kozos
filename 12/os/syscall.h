@@ -1,6 +1,7 @@
 #ifndef _KOZOS_SYSCALL_H_INCLUDED_
 #define _KOZOS_SYSCALL_H_INCLUDED_
 #include "defines.h"
+#include "interrupt.h"
 
 typedef enum {
   KZ_SYSCALL_TYPE_RUN = 0,
@@ -14,6 +15,7 @@ typedef enum {
   KZ_SYSCALL_TYPE_KMFREE,
   KZ_SYSCALL_TYPE_SEND,
   KZ_SYSCALL_TYPE_RECV,
+  KZ_SYSCALL_TYPE_SETINTR,
 } kz_syscall_type_t;
 
 typedef struct {
@@ -67,6 +69,11 @@ typedef struct {
       char **pp;
       kz_thread_id_t ret;
     } recv;
+    struct {
+      softvec_type_t type;
+      kz_handler_t handler;
+      int ret;
+    } setintr;
   } un;
 } kz_syscall_param_t;
 
